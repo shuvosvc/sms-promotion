@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const axios = require("axios");
 
 const {  SECRET_KEY,BASE_URL } = require("./config/ApplicationSettings");
+const { title } = require("process");
  // 🔒 Shared secret key
 console.log(SECRET_KEY);
 
@@ -14,8 +15,10 @@ const createSignature = (body, timestamp) => {
 const sendSMS = async () => {
     try {
         const reqBody = {
+            title: "Test SMS",
+            content: "This is a test message",
             message: "ok this is working domain is fixed and sms returning in hook",
-            phoneNumbers: ["+8801629615314","+8801521236479","11234"]
+            phoneNumbers: ["+815314","+8809","11234"]
         };
 
         const timestamp = Date.now();

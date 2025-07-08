@@ -22,3 +22,5 @@ exports.ERROR_IN_EXECUTION = QError.bind(null, 102, "Something went wrong! Pleas
 exports.UNAUTHORIZED = QError.bind(null, 403, "You don't have authority for this action.");
 exports.NO_FIELDS_PROVIDED = QError.bind(null, 400, "No fields provided.");
 exports.INVALID_FIELDS_PROVIDED = QError.bind(null, 422, "Invalid data provided.");
+exports.INVALID_USER = QError.bind(null, 404, "User not found.");
+exports.INVALID_EMAIL_PASS = QError.bind(null, 401, "Invalid email or password.");

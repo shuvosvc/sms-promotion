@@ -13,8 +13,11 @@ const ngrok = require("@ngrok/ngrok");
 require("dotenv").config();
 const { port, BASE_URL, ngrok_domain} = require("./config/ApplicationSettings");
 const {registerWebhook,closeWebhook} = require("./helpers/hook");
-const { getLocalIP} = require("./helpers/common");
+// const { getLocalIP} = require("./helpers/common");
 const { msg,hookapi} = require("./controllers/sms");
+const {signin}= require("./controllers/user");
+const {deletePromotion,updatePromotion,getAllPromotions,getPromotionById,createPromotion}= require("./controllers/promotion");
+
 /* Routes Config */
 app.set("port", port);
 
@@ -47,6 +50,28 @@ app.use(limiter);
 app.get(`${BASE_URL}/`, (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
+
+
+app.post(`${BASE_URL}/signin`, signin);
+app.post(`${BASE_URL}/createPromotion`, createPromotion);
+app.get(`${BASE_URL}/getAllPromotions`, getAllPromotions);  
+app.get(`${BASE_URL}/getPromotionById`, getPromotionById);
+app.post(`${BASE_URL}/updatePromotion`, updatePromotion);
+app.post(`${BASE_URL}/deletePromotion`, deletePromotion);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 app.post(`${BASE_URL}/send-sms`, msg);
