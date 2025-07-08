@@ -10,92 +10,7 @@ const { parsePhoneNumberFromString } = require('libphonenumber-js');
 const { log } = require("logfmt");
 
 
-
-// exports.msg = api(["promotionId", "phoneNumbers"], auth(async (req, connection) => {
-//     const {phoneNumbers, promotionId } = req.body;
-
-
-//     // Step 2: Validate phoneNumbers array
-//     if (!Array.isArray(phoneNumbers) || phoneNumbers.length === 0) throw new errors.INVALID_FIELDS_PROVIDED();
-
-//     // Step 3: Separate valid & invalid phone numbers
-//     const validPhoneNumbers = [];
-//     const invalidPhoneNumbers = [];
-
-//     phoneNumbers.forEach(phone => {
-//         const phoneNumber = parsePhoneNumberFromString(phone);
-//         if (phoneNumber && phoneNumber.isValid()) {
-//             validPhoneNumbers.push(phoneNumber.number); // Save valid number in E.164 format
-//         } else {
-//             invalidPhoneNumbers.push(phone);
-//         }
-//     });
-
-//     let promotionInfo = null;
-
-//     if (validPhoneNumbers.length > 0) {
-
-//         const isExist = await connection.queryOne(
-//             `SELECT id,msg FROM promotion WHERE id = $1 AND deleted = FALSE`,
-//             [promotionId]
-//         );
-
-//         if (!isExist) {
-//             throw new errors.NOT_FOUND("Promotion not found");
-//         }
-//         promotionInfo = isExist;
-
-//     }
-
-//     // Step 4: Send SMS only if there are valid numbers
-//     let responseData = null;
-
-
-
-
-//     if (validPhoneNumbers.length > 0) {
-//         const response = await axios.post(SGUM, {
-//             message:  promotionInfo.msg,
-//             phoneNumbers: validPhoneNumbers,
-//         }, {
-//             auth: {
-//                 username: SGU_user,
-//                 password: SGU_pass,
-//             },
-//             headers: {
-//                 "Content-Type": "application/json"
-//             }
-//         });
-
-//         responseData = response.data; // Store API response
-//     }
-
-//  if (responseData && responseData.id) {  
-
-    
-//   const values = validPhoneNumbers.map(phone =>
-//     `(${responseData.id},${promotionInfo.id} , '${phone}')`
-//   ).join(",");
-
-//   const insertQuery = `
-//     INSERT INTO sms_log (id,promotion_id, phone, )
-//     VALUES ${values}
-//   `;
-
-//   await connection.query(insertQuery);
-// }
-
-
-//     // Step 6: Return response
-//     return {
-//         success: true,
-//         invalidNumbers: invalidPhoneNumbers, responseData
-//     };
-// }));
-
-
-
-
+const { io } = require('../index'); 
 
 
 
@@ -172,6 +87,16 @@ exports.msg = api(["promotionId", "phoneNumbers"], auth(async (req, connection) 
   await connection.query(insertQuery);
 }
 
+
+io.emit('promotion_sent_summary', {
+  promotionId: promotionInfo.id,
+  validNumbers: validPhoneNumbers,
+  invalidNumbers: invalidPhoneNumbers,
+});
+
+
+
+
   return {
     success: true,
     invalidNumbers: invalidPhoneNumbers,
@@ -209,13 +134,26 @@ exports.hookapi = api(["deviceId", "webhookId", "payload"], async (req, connecti
   const deliveredAtUTC = moment(deliveredAt).utc().format('YYYY-MM-DD HH:mm:ss.SSS');
 
   // ✅ Update the delivery status
-  await connection.query(
+ const promoRow= await connection.queryOne(
     `UPDATE sms_log
      SET delivery_status = $1,
          status_updated_at = $2
-     WHERE hook_id = $3 AND phone = $4`,
+     WHERE hook_id = $3 AND phone = $4 returning promotion_id`,
     ['success', deliveredAtUTC, messageId, phoneNumber]
   );
+
+
+// Inside hookapi after update
+
+
+io.emit('sms_status_update', {
+  promotionId: promoRow.promotion_id,
+  hook_id: messageId,
+  phone: phoneNumber,
+  status: 'success',
+  deliveredAt: deliveredAtUTC,
+});
+
 
   return { flag: 200 };
 });
