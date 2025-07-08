@@ -18,7 +18,7 @@ const sendSMS = async () => {
             title: "Test SMS",
             content: "This is a test message",
             message: "ok this is working domain is fixed and sms returning in hook",
-            phoneNumbers: ["+815314","+8809","11234"]
+            phoneNumbers: ["+8801629615314","+8801521236479","11234"]
         };
 
         const timestamp = Date.now();

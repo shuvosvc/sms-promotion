@@ -24,3 +24,4 @@ exports.NO_FIELDS_PROVIDED = QError.bind(null, 400, "No fields provided.");
 exports.INVALID_FIELDS_PROVIDED = QError.bind(null, 422, "Invalid data provided.");
 exports.INVALID_USER = QError.bind(null, 404, "User not found.");
 exports.INVALID_EMAIL_PASS = QError.bind(null, 401, "Invalid email or password.");
+exports.NOT_FOUND = QError.bind(null, 404, "Resource not found.");

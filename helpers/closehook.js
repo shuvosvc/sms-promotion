@@ -24,5 +24,5 @@ const deleteWebhook = async (uniqueId) => {
 };
 
 // Example usage with your unique webhook ID
-const uniqueId = "061svcng1"; // Replace with the actual unique ID you want to delete
+const uniqueId = "061svcng2"; // Replace with the actual unique ID you want to delete
 deleteWebhook(uniqueId);
